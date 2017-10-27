@@ -10,6 +10,7 @@
        n)))
 
 (defn project1 [n]
+  "Sum of numbers less than 1000 that are multiples of 3 or 5"
   (let [threes (make-summer 3)
         fives (make-summer 5)
         fiveteens (make-summer 15)]
@@ -24,6 +25,7 @@
       sum)))
 
 (defn project2 [n]
+  "Sum of even Fibonacci numbers less that 4000000"
   (loop [fib1 1 fib2 2 sum 0]
     (if (>= fib2 n)
       sum
