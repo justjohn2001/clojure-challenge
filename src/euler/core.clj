@@ -35,7 +35,7 @@
 
 (require '[clojure.string :as str])
 
-(defn is-pallandromic "test whether a number is pallandromic"
+(defn palindromic? "test whether a number is palindromic"
   [n]
   (let [a (rest (str/split (str n) #""))]
     (= a (reverse a))))
@@ -54,7 +54,7 @@
 
 (defn project4 []
   (loop [n (* 999 999)]
-    (if (and (is-pallandromic n) (has-3-digit-factors n))
+    (if (and (palindromic? n) (has-3-digit-factors n))
       n
       (recur (dec n)))))
 
