@@ -33,8 +33,35 @@
                                       (+ sum fib2)
                                       sum)))))
 
+(require '[clojure.string :as str])
+
+(defn is-pallandromic "test whether a number is pallandromic"
+  [n]
+  (let [a (rest (str/split (str n) #""))]
+    (= a (reverse a))))
+ 
+(defn has-3-digit-factors
+  [n]
+  (let [sqrt-n (Math/floor (Math/sqrt n))]
+    (if
+      (> sqrt-n 999) false
+      (loop [i sqrt-n]
+        (cond
+          (< i 100) false
+          (> (/ n i) 999) false
+          (and (= 0.0 (mod n i)) (= (/ n i) (Math/floor (/ n i)))) true
+          :else (recur (dec i)))))))
+
+(defn project4 []
+  (loop [n (* 999 999)]
+    (if (and (is-pallandromic n) (has-3-digit-factors n))
+      n
+      (recur (dec n)))))
+
 (defn -main
   [& args]
   (println "Project 1 - " (project1 (- 1000 1)))
   (println "Project 1 using loop - " (project1-with-loop 1000))
-  (println "Project 2 - " (project2 4000000)))
+  (println "Project 2 - " (project2 4000000))
+  (println "Project 4 - " (project4))
+  )
