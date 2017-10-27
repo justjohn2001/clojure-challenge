@@ -21,11 +21,18 @@
       (if (or (= 0 (mod i 3)) (= 0 (mod i 5)))
         (recur (inc i) (+ sum i))
         (recur (inc i) sum))
-      sum)
-    )
-  )
+      sum)))
+
+(defn project2 [n]
+  (loop [fib1 1 fib2 2 sum 0]
+    (if (>= fib2 n)
+      sum
+      (recur fib2 (+ fib2 fib1) (if (= 0 (mod fib2 2))
+                                      (+ sum fib2)
+                                      sum)))))
 
 (defn -main
   [& args]
   (println "Project 1 - " (project1 (- 1000 1)))
-  (println "Project 1 using loop - " (project1-with-loop 1000)))
+  (println "Project 1 using loop - " (project1-with-loop 1000))
+  (println "Project 2 - " (project2 4000000)))
