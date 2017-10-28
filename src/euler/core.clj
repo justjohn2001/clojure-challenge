@@ -30,17 +30,8 @@
     (if (>= fib2 n)
       sum
       (recur fib2 (+ fib2 fib1) (if (= 0 (mod fib2 2))
-                                  (+ sum fib2)
-                                  sum)))))
-
-(defn project3 [n]
-  "Larges Prime Factor"
-  (loop [partial n]
-    (if (is-prime? partial)
-      partial
-      (recur (/ partial (factor partial))))
-    )
-  )
+                                      (+ sum fib2)
+                                      sum)))))
 
 (defn primes
   ;I found a more efficient algorithm online, but since I am learning I thought I would write one myself
