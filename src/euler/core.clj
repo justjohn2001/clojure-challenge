@@ -18,11 +18,11 @@
 
 (defn project1-with-loop [n]
   (loop [i 1 sum 0]
-    (if (< i n)
+    (if (>= i n)
+      sum
       (if (or (= 0 (mod i 3)) (= 0 (mod i 5)))
         (recur (inc i) (+ sum i))
-        (recur (inc i) sum))
-      sum)))
+        (recur (inc i) sum)))))
 
 (defn project2 [n]
   "Sum of even Fibonacci numbers less that 4000000"
@@ -51,7 +51,7 @@
       (cons n (lazy-seq (primes (conj found_primes n) (inc n)))))))
 
 (defn project3
-  ([m] (project3 m (primes)))
+  ([n] (project3 n (primes)))
   ([n p] (let [f (first p)]
     (cond
       (= f n) n
@@ -83,8 +83,20 @@
       n
       (recur (dec n)))))
 
+(defn factor [n]
+  (loop [working-n n factors '() p (primes)]
+    (let [f (first p)]
+      (cond 
+        (= f working-n) (conj factors f)
+        (= 0 (mod working-n f)) (recur (/ working-n f) (conj factors f) p)
+        :else (recur working-n factors (rest p))))))
+
+(defn problem5 []
+  (factor 4)
+)
+
 (defn project7 [n]
-  (last (take 10001 (primes))))
+  (last (take n (primes))))
 
 (defn -main
   [& args]
