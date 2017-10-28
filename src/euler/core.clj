@@ -30,8 +30,17 @@
     (if (>= fib2 n)
       sum
       (recur fib2 (+ fib2 fib1) (if (= 0 (mod fib2 2))
-                                      (+ sum fib2)
-                                      sum)))))
+                                  (+ sum fib2)
+                                  sum)))))
+
+(defn project3 [n]
+  "Larges Prime Factor"
+  (loop [partial n]
+    (if (is-prime? partial)
+      partial
+      (recur (/ partial (factor partial))))
+    )
+  )
 
 (defn -main
   [& args]
