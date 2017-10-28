@@ -33,6 +33,22 @@
                                       (+ sum fib2)
                                       sum)))))
 
+(defn primes
+  ;I found a more efficient algorithm online, but since I am learning I thought I would write one myself
+  ([] (primes (set nil) 2))
+  ([found_primes n]
+    (if (some #(= 0 (mod n %)) found_primes)
+      (recur found_primes (inc n))
+      (cons n (lazy-seq (primes (conj found_primes n) (inc n)))))))
+
+(defn project3
+  ([m] (project3 m (primes)))
+  ([n p] (let [f (first p)]
+    (cond
+      (= f n) n
+      (= 0 (mod n f)) (recur (/ n f) p)
+      :else (recur n (rest p))))))
+
 (require '[clojure.string :as str])
 
 (defn palindromic? "test whether a number is palindromic"
@@ -58,10 +74,15 @@
       n
       (recur (dec n)))))
 
+(defn project7 [n]
+  (last (take 10001 (primes))))
+
 (defn -main
   [& args]
   (println "Project 1 - " (project1 (- 1000 1)))
   (println "Project 1 using loop - " (project1-with-loop 1000))
   (println "Project 2 - " (project2 4000000))
+  (println "Project 3 - " (project3 6857))
   (println "Project 4 - " (project4))
+  (println "Project 7 - " (project7 10001))
   )
