@@ -83,7 +83,6 @@
         :else (recur working-n factors (rest p))))))
 
 (defn problem5 []
-  (factor 4)
 )
 
 (defn project7 [n]
