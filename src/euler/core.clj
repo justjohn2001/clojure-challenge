@@ -24,6 +24,16 @@
         (recur (inc i) (+ sum i))
         (recur (inc i) sum)))))
 
+(defn threes-and-fives
+  ([] (threes-and-fives 1))
+  ([i] (if (or (zero? (mod i 3)) (zero? (mod i 5)))
+    (cons i (lazy-seq (threes-and-fives (inc i))))
+    (recur (inc i)))))
+
+(defn project1-with-seq [n]
+  (reduce + (take-while #(< % n) (threes-and-fives)))
+)
+
 (defn project2 [n]
   "Sum of even Fibonacci numbers less that 4000000"
   (loop [fib1 1 fib2 2 sum 0]
@@ -101,6 +111,7 @@
   [& args]
   (println "Project 1 - " (project1 (- 1000 1)))
   (println "Project 1 using loop - " (project1-with-loop 1000))
+  (println "Project 1 using seq - " (project1-with-seq 1000))
   (println "Project 2 - " (project2 4000000))
   (println "Project 2 advanced - " (project2-with-seq 4000000))
   (println "Project 3 - " (project3 6857))
