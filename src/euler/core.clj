@@ -83,6 +83,7 @@
         :else (recur working-n factors (rest p))))))
 
 (defn project5 []
+  (reduce (fn [h value] (into h {value (inc (get h value 0))})) {} '(5 5 3 2 2 2 ))
 )
 
 (defn project7 [n]
