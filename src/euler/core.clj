@@ -73,6 +73,10 @@
   [n]
   (let [a (rest (str/split (str n) #""))]
     (= a (reverse a))))
+
+(defn palindromic2? [n]
+  (let [a (seq (str n)) b (reverse a)]
+    (= a b)))
  
 (defn has-3-digit-factors
   [n]
@@ -100,9 +104,24 @@
         (= 0 (mod working-n f)) (recur (/ working-n f) (conj factors f) p)
         :else (recur working-n factors (rest p))))))
 
-(defn project5 []
-  (reduce (fn [h value] (into h {value (inc (get h value 0))})) {} '(5 5 3 2 2 2 ))
-)
+(defn lazy-factor
+  ([n] (lazy-factor n (primes)))
+  ([n p] (let [f (first p)]
+      (cond
+        (= n 1) nil
+        (zero? (mod n f)) (cons f (lazy-seq (lazy-factor (/ n f) p)))
+        :else (recur n (rest p))))))
+
+(defn factor-seq
+  ([] (factor-seq 1))
+  ([n] (cons (lazy-factor n) (lazy-seq (factor-seq (inc n))))))
+
+(defn project5 [n]
+  (reduce (fn [sum [a b]] (* sum (long (Math/pow a b)))) 1
+    (reduce (fn [new-hash [k v]]
+        (into new-hash {k (max (get new-hash k 0) v)}))
+      {}
+      (mapcat (fn [h] (map identity h)) (map frequencies (take n (factor-seq)))))))
 
 (defn project7 [n]
   (last (take n (primes))))
@@ -116,5 +135,6 @@
   (println "Project 2 advanced - " (project2-with-seq 4000000))
   (println "Project 3 - " (project3 6857))
   (println "Project 4 - " (project4))
+  (println "Project 5 - " (project5 20))
   (println "Project 7 - " (project7 10001))
   )
