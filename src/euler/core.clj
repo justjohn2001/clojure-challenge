@@ -33,6 +33,14 @@
                                       (+ sum fib2)
                                       sum)))))
 
+(defn fibonacci-seq
+  ([] (fibonacci-seq 1 1))
+  ([f1 f2] (cons f2 (lazy-seq (fibonacci-seq f2 (+ f1 f2))))))
+
+(defn project2-with-seq [n]
+  (reduce + (filter even? (take-while #(< % n) (fibonacci-seq))))
+)
+
 (defn primes
   ;I found a more efficient algorithm online, but since I am learning I thought I would write one myself
   ([] (primes (set nil) 2))
@@ -83,6 +91,7 @@
         :else (recur working-n factors (rest p))))))
 
 (defn project5 []
+  (reduce (fn [h value] (into h {value (inc (get h value 0))})) {} '(5 5 3 2 2 2 ))
 )
 
 (defn project7 [n]
@@ -93,6 +102,7 @@
   (println "Project 1 - " (project1 (- 1000 1)))
   (println "Project 1 using loop - " (project1-with-loop 1000))
   (println "Project 2 - " (project2 4000000))
+  (println "Project 2 advanced - " (project2-with-seq 4000000))
   (println "Project 3 - " (project3 6857))
   (println "Project 4 - " (project4))
   (println "Project 7 - " (project7 10001))
