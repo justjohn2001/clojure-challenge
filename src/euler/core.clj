@@ -116,12 +116,19 @@
   ([] (factor-seq 1))
   ([n] (cons (lazy-factor n) (lazy-seq (factor-seq (inc n))))))
 
+(defn int-pow [n x]
+  (reduce * (repeat x n)))
+
 (defn project5 [n]
-  (reduce (fn [sum [a b]] (* sum (long (Math/pow a b)))) 1
+  (reduce (fn [sum [a b]] (* sum (int-pow a b))) 1
     (reduce (fn [new-hash [k v]]
         (into new-hash {k (max (get new-hash k 0) v)}))
       {}
       (mapcat (fn [h] (map identity h)) (map frequencies (take n (factor-seq)))))))
+
+(defn project6 [n]
+  (- (+ (* (running-sum n) (running-sum n))) (reduce + (map #(* % %) (range 1 (inc n)))))
+)
 
 (defn project7 [n]
   (last (take n (primes))))
@@ -136,5 +143,6 @@
   (println "Project 3 - " (project3 6857))
   (println "Project 4 - " (project4))
   (println "Project 5 - " (project5 20))
+  (println "Project 6 - " (project6 100))
   (println "Project 7 - " (project7 10001))
   )
