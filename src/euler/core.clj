@@ -82,7 +82,7 @@
         (= 0 (mod working-n f)) (recur (/ working-n f) (conj factors f) p)
         :else (recur working-n factors (rest p))))))
 
-(defn problem5 []
+(defn project5 []
 )
 
 (defn project7 [n]
