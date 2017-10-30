@@ -52,15 +52,40 @@
 )
 
 (defn primes
-  ;I found a more efficient algorithm online, but since I am learning I thought I would write one myself
-  ([] (primes (set nil) 2))
+  ; I found a more efficient algorithm online, but since I am learning I thought I would write one myself
+  ([] (primes [] 2))
   ([found_primes n]
     (if (some #(= 0 (mod n %)) found_primes)
       (recur found_primes (inc n))
       (cons n (lazy-seq (primes (conj found_primes n) (inc n)))))))
 
+(defn reinsert [comb n factors]
+  (reduce #(assoc %1 (+ n %2) (conj (get %1 (+ n %2) []) %2))
+    comb
+    factors))
+
+(defn primes-v2
+  ; I think I have enough understanding to implement the more efficient algorithm
+  ([] (primes-v2 {} 2))
+  ([comb n]
+    (if-let [factors (get comb n)]
+      (recur (reinsert (dissoc comb n) n factors) (inc n))
+      (cons n (lazy-seq (primes-v2 (assoc comb (* n n) [n]) (inc n)))))))
+
+(defn gen-primes "Generates an infinite, lazy sequence of prime numbers"
+  []
+  (let [reinsert (fn [table x prime]
+                   (update-in table [(+ prime x)] conj prime))]
+    (defn primes-step [table d]
+                 (if-let [factors (get table d)]
+                   (recur (reduce #(reinsert %1 d %2) (dissoc table d) factors)
+                          (inc d))
+                   (lazy-seq (cons d (primes-step (assoc table (* d d) (list d))
+                                                 (inc d))))))
+    (primes-step {} 2)))
+
 (defn project3
-  ([n] (project3 n (primes)))
+  ([n] (project3 n (primes-v2)))
   ([n p] (let [f (first p)]
     (cond
       (= f n) n
@@ -97,7 +122,7 @@
       (recur (dec n)))))
 
 (defn factor [n]
-  (loop [working-n n factors '() p (primes)]
+  (loop [working-n n factors '() p (primes-v2)]
     (let [f (first p)]
       (cond 
         (= f working-n) (conj factors f)
@@ -105,7 +130,7 @@
         :else (recur working-n factors (rest p))))))
 
 (defn lazy-factor
-  ([n] (lazy-factor n (primes)))
+  ([n] (lazy-factor n (primes-v2)))
   ([n p] (let [f (first p)]
       (cond
         (= n 1) nil
@@ -120,7 +145,8 @@
   (reduce * (repeat x n)))
 
 (defn project5 [n]
-  (reduce (fn [sum [a b]] (* sum (int-pow a b))) 1
+  (reduce (fn [sum [a exp]] (* sum (int-pow a exp)))
+    1
     (reduce (fn [new-hash [k v]]
         (into new-hash {k (max (get new-hash k 0) v)}))
       {}
@@ -131,7 +157,10 @@
 )
 
 (defn project7 [n]
-  (last (take n (primes))))
+  (last (take n (primes-v2))))
+
+(defn project10 [n]
+  (reduce + (take-while #(< % n) (primes-v2))))
 
 (defn -main
   [& args]
@@ -145,4 +174,5 @@
   (println "Project 5 - " (project5 20))
   (println "Project 6 - " (project6 100))
   (println "Project 7 - " (project7 10001))
+  (println "Project 10 - " (project10 2000000))
   )
