@@ -9,83 +9,38 @@
     (* (running-sum (Math/floor (/ i n)))
        n)))
 
-(defn project1 [n]
-  "Sum of numbers less than 1000 that are multiples of 3 or 5"
-  (let [threes (make-summer 3)
-        fives (make-summer 5)
-        fiveteens (make-summer 15)]
-    (- (+ (threes n) (fives n)) (fiveteens n))))
-
-(defn project1-with-loop [n]
-  (loop [i 1 sum 0]
-    (if (>= i n)
-      sum
-      (if (or (= 0 (mod i 3)) (= 0 (mod i 5)))
-        (recur (inc i) (+ sum i))
-        (recur (inc i) sum)))))
-
 (defn threes-and-fives
   ([] (threes-and-fives 1))
   ([i] (if (or (zero? (mod i 3)) (zero? (mod i 5)))
     (cons i (lazy-seq (threes-and-fives (inc i))))
     (recur (inc i)))))
 
-(defn project1-with-seq [n]
+(defn project1 [n]
   (reduce + (take-while #(< % n) (threes-and-fives)))
 )
-
-(defn project2 [n]
-  "Sum of even Fibonacci numbers less that 4000000"
-  (loop [fib1 1 fib2 2 sum 0]
-    (if (>= fib2 n)
-      sum
-      (recur fib2 (+ fib2 fib1) (if (= 0 (mod fib2 2))
-                                      (+ sum fib2)
-                                      sum)))))
 
 (defn fibonacci-seq
   ([] (fibonacci-seq 1 1))
   ([f1 f2] (cons f2 (lazy-seq (fibonacci-seq f2 (+ f1 f2))))))
 
-(defn project2-with-seq [n]
+(defn project2 [n]
   (reduce + (filter even? (take-while #(< % n) (fibonacci-seq))))
 )
-
-(defn primes
-  ; I found a more efficient algorithm online, but since I am learning I thought I would write one myself
-  ([] (primes [] 2))
-  ([found_primes n]
-    (if (some #(= 0 (mod n %)) found_primes)
-      (recur found_primes (inc n))
-      (cons n (lazy-seq (primes (conj found_primes n) (inc n)))))))
 
 (defn reinsert [comb n factors]
   (reduce #(assoc %1 (+ n %2) (conj (get %1 (+ n %2) []) %2))
     comb
     factors))
 
-(defn primes-v2
-  ; I think I have enough understanding to implement the more efficient algorithm
-  ([] (primes-v2 {} 2))
+(defn primes
+  ([] (primes {} 2))
   ([comb n]
     (if-let [factors (get comb n)]
       (recur (reinsert (dissoc comb n) n factors) (inc n))
-      (cons n (lazy-seq (primes-v2 (assoc comb (* n n) [n]) (inc n)))))))
-
-(defn gen-primes "Generates an infinite, lazy sequence of prime numbers"
-  []
-  (let [reinsert (fn [table x prime]
-                   (update-in table [(+ prime x)] conj prime))]
-    (defn primes-step [table d]
-                 (if-let [factors (get table d)]
-                   (recur (reduce #(reinsert %1 d %2) (dissoc table d) factors)
-                          (inc d))
-                   (lazy-seq (cons d (primes-step (assoc table (* d d) (list d))
-                                                 (inc d))))))
-    (primes-step {} 2)))
+      (cons n (lazy-seq (primes (assoc comb (* n n) [n]) (inc n)))))))
 
 (defn project3
-  ([n] (project3 n (primes-v2)))
+  ([n] (project3 n (primes)))
   ([n p] (let [f (first p)]
     (cond
       (= f n) n
@@ -94,12 +49,7 @@
 
 (require '[clojure.string :as str])
 
-(defn palindromic? "test whether a number is palindromic"
-  [n]
-  (let [a (rest (str/split (str n) #""))]
-    (= a (reverse a))))
-
-(defn palindromic2? [n]
+(defn palindromic? [n]
   (let [a (seq (str n)) b (reverse a)]
     (= a b)))
  
@@ -121,16 +71,8 @@
       n
       (recur (dec n)))))
 
-(defn factor [n]
-  (loop [working-n n factors '() p (primes-v2)]
-    (let [f (first p)]
-      (cond 
-        (= f working-n) (conj factors f)
-        (= 0 (mod working-n f)) (recur (/ working-n f) (conj factors f) p)
-        :else (recur working-n factors (rest p))))))
-
 (defn lazy-factor
-  ([n] (lazy-factor n (primes-v2)))
+  ([n] (lazy-factor n (primes)))
   ([n p] (let [f (first p)]
       (cond
         (= n 1) nil
@@ -157,7 +99,7 @@
 )
 
 (defn project7 [n]
-  (last (take n (primes-v2))))
+  (last (take n (primes))))
 
 (defn project8 [l n]
   (let [digit-list (map #(- (int %) 48) (seq l))]
@@ -175,15 +117,12 @@
     (range 1 (/ n 3))))
 
 (defn project10 [n]
-  (reduce + (take-while #(< % n) (primes-v2))))
+  (reduce + (take-while #(< % n) (primes))))
 
 (defn -main
   [& args]
-  (println "Project 1 - " (project1 (- 1000 1)))
-  (println "Project 1 using loop - " (project1-with-loop 1000))
-  (println "Project 1 using seq - " (project1-with-seq 1000))
+  (println "Project 1 - " (project1 1000))
   (println "Project 2 - " (project2 4000000))
-  (println "Project 2 advanced - " (project2-with-seq 4000000))
   (println "Project 3 - " (project3 6857))
   (println "Project 4 - " (project4))
   (println "Project 5 - " (project5 20))
