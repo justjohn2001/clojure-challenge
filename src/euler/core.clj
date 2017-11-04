@@ -239,6 +239,18 @@
     strsum (str sum)]
   (subs strsum 0 10)))
 
+(def collatz (memoize (fn [n]
+  (cond
+    (= n 1) '(1)
+    (even? n) (cons n (lazy-seq (collatz (/ n 2))))
+    :else (cons n (lazy-seq (collatz (inc (* n 3)))))))))
+
+(defn project14 [n]
+  (loop [m 1 max-len 0 max-val 0]
+    (if (>= m n) {max-val max-len}
+      (let [new-len (count (collatz m))]
+        (if (> max-len new-len) (recur (inc m) max-len max-val) (recur (inc m) new-len m) )))))
+
 (defn -main
   [& args]
   (println "Project 1 - " (project1 1000))
@@ -253,4 +265,5 @@
   (println "Project 10 - " (project10 2000000))
   (println "Project 12 - " (project12 500))
   (println "Project 13 - " (project13))
+  (println "Project 14 - " (project14 1000000))
   )
