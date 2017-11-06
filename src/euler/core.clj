@@ -283,6 +283,11 @@
       (let [new-len (count (collatz m))]
         (if (> max-len new-len) (recur (inc m) max-len max-val) (recur (inc m) new-len m) )))))
 
+(def project15 (memoize (fn [r c]
+  (if (or (= r 0) (= c 0))
+    1
+    (+ (project15 (dec r) c) (project15 r (dec c)))))))
+
 (defn -main
   [& args]
   (println "Project 1 - " (project1 1000))
@@ -299,4 +304,5 @@
   (println "Project 12 - " (project12 500))
   (println "Project 13 - " (project13))
   (println "Project 14 - " (project14 1000000))
+  (println "Project 15 - " (project15 20 20))
   )
