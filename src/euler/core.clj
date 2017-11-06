@@ -288,6 +288,12 @@
     1
     (+ (project15 (dec r) c) (project15 r (dec c)))))))
 
+(defn project16
+  ([n] (project16 n 0))
+  ([n sum] (if (= n 0)
+             sum
+             (recur (bigint (/ n 10)) (+ sum (mod n 10))))))
+
 (defn -main
   [& args]
   (println "Project 1 - " (project1 1000))
@@ -305,4 +311,5 @@
   (println "Project 13 - " (project13))
   (println "Project 14 - " (project14 1000000))
   (println "Project 15 - " (project15 20 20))
+  (println "Project 16 - " (project16 (apply * (repeat 1000 2N))))
   )
