@@ -311,9 +311,9 @@
     [63 66 4 68 89 53 67 30 73 16 69 87 40 31]
     [4 62 98 27 23 9 70 98 73 93 38 53 60 4 23]])
 
-(defn project18 
+(defn project18
   ([tri] (project18 tri (into [] (repeat (inc (count (first tri))) 0))))
-  ([tri sums] 
+  ([tri sums]
     (letfn [(max-of-pairs
       ([a] (max-of-pairs a []))
       ([a sums] (if (< (count a) 2)
@@ -321,6 +321,43 @@
           (recur (rest a) (conj sums (max (first a) (second a)))))))]
       (if (= 1 (count sums)) (first sums)
         (recur (rest tri) (into [] (map + (first tri) (max-of-pairs sums))))))))
+
+(defn next-122 [known-values]
+  {:pre [(sorted? known-values)]}
+  (let [[n s] (first known-values)]
+       (dissoc
+        (reduce (fn rf [acc v]
+                  (let [m (last v)
+                        v-count (count v)
+                        current (get acc m)
+                        current-count (if current
+                                        (count (first current))
+                                        Integer/MAX_VALUE)]
+                    (update acc
+                            m
+                            #(cond
+                               (< v-count current-count) #{v}
+                               (= v-count current-count) (conj % v)
+                               :else %))))
+                known-values
+                (apply clojure.set/union
+                       (map (fn [v]
+                              (let [maximum (last v)]
+                                (into #{}
+                                      (mapv #(conj v (+ maximum %)) v))))
+                            s)))
+        n)))
+
+(defn seq-122
+  ([] (seq-122 (sorted-map 1 #{[1]})))
+  ([known-values]
+   (lazy-seq (cons (second (first known-values)) (seq-122 (next-122 known-values))))))
+
+(defn project122
+  [n]
+  (reduce (fn [acc v] (+ acc (dec (count (first (v))))))
+          0
+          (take n (seq-122))))
 
 (defn -main
   [& args]
