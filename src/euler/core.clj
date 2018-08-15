@@ -355,12 +355,13 @@
 
 (defn project122
   [n]
-  (reduce (fn [acc v] (+ acc (dec (count (first (v))))))
+  (reduce (fn [acc v] (+ acc (dec (count (first v)))))
           0
           (take n (seq-122))))
 
 (defn -main
   [& args]
+  (println "Project 122 - " (project122 200))
   (println "Project 18 - " (project18 (reverse project-18-triangle)))
   (println "Project 16 - " (project16 (apply * (repeat 1000 2N))))
   (println "Project 15 - " (project15 20 20))
