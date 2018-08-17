@@ -340,8 +340,18 @@
              (mod (inc month) 12)
              (rest days-in-month)
              (+ c (if (zero? (mod dow 7)) 1 0))
-             (if (zero?) (mod dow 7))
              (+ dow (first days-in-month))))))
+
+(defn project20
+  [n]
+  (loop [v (apply * 1N (range 1 (inc n)))
+         s 0]
+    (if (zero? v)
+      s
+      (recur (quot v 10) (+ s (mod v 10))))))
+
+(defn project21
+  [n])
 
 (defn next-122 [known-values]
   {:pre [(sorted? known-values)]}
@@ -383,6 +393,8 @@
 (defn -main
   [& args]
   (println "Project 122 - " (project122 200))
+  (println "Project 20 - " (project20 200))
+  (println "Project 19 - " (project19))
   (println "Project 18 - " (project18 (reverse project-18-triangle)))
   (println "Project 16 - " (project16 (apply * (repeat 1000 2N))))
   (println "Project 15 - " (project15 20 20))
