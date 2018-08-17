@@ -322,31 +322,52 @@
       (if (= 1 (count sums)) (first sums)
         (recur (rest tri) (into [] (map + (first tri) (max-of-pairs sums))))))))
 
+(def months '(31 28 31 30 31 30 31 31 30 31 30 31
+              31 28 31 30 31 30 31 31 30 31 30 31
+              31 28 31 30 31 30 31 31 30 31 30 31
+              31 29 31 30 31 30 31 31 30 31 30 31))
+
+(defn project19
+  []
+  (loop [year 1901
+         month 0
+         days-in-month (cycle months)
+         c 0
+         dow 2]
+    (if (>= year 2001)
+      c
+      (recur (+ year (quot (inc month) 12))
+             (mod (inc month) 12)
+             (rest days-in-month)
+             (+ c (if (zero? (mod dow 7)) 1 0))
+             (if (zero?) (mod dow 7))
+             (+ dow (first days-in-month))))))
+
 (defn next-122 [known-values]
   {:pre [(sorted? known-values)]}
   (let [[n s] (first known-values)]
-       (dissoc
-        (reduce (fn rf [acc v]
-                  (let [m (last v)
-                        v-count (count v)
-                        current (get acc m)
-                        current-count (if current
-                                        (count (first current))
-                                        Integer/MAX_VALUE)]
-                    (update acc
-                            m
-                            #(cond
-                               (< v-count current-count) #{v}
-                               (= v-count current-count) (conj % v)
-                               :else %))))
-                known-values
-                (apply clojure.set/union
-                       (map (fn [v]
-                              (let [maximum (last v)]
-                                (into #{}
-                                      (mapv #(conj v (+ maximum %)) v))))
-                            s)))
-        n)))
+    (dissoc
+     (reduce (fn rf [acc v]
+               (let [m (last v)
+                     v-count (count v)
+                     current (get acc m)
+                     current-count (if current
+                                     (count (first current))
+                                     Integer/MAX_VALUE)]
+                 (update acc
+                         m
+                         #(cond
+                            (< v-count current-count) #{v}
+                            (= v-count current-count) (conj % v)
+                            :else %))))
+             known-values
+             (apply clojure.set/union
+                    (map (fn [v]
+                           (let [maximum (last v)]
+                             (into #{}
+                                   (mapv #(conj v (+ maximum %)) v))))
+                         s)))
+     n)))
 
 (defn seq-122
   ([] (seq-122 (sorted-map 1 #{[1]})))
