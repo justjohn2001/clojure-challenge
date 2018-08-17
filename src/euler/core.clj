@@ -1,12 +1,19 @@
 (ns euler.core
-  (:gen-class))
+  (:gen-class)
+  (:require [clojure.set :as set])
+  (:import java.lang.Math))
 
 (defn running-sum [n]
   (/ (* n (+ n 1)) 2))
 
 (defn make-summer [n]
   (fn [i]
-    (* (running-sum (Math/floor (/ i n)))
+    (-> i
+        (/ n)
+        Math/floor
+        running-sum
+        (* n))
+    #_(* (running-sum (Math/floor (/ i n)))
        n)))
 
 (defn threes-and-fives
@@ -20,7 +27,7 @@
 )
 
 (defn fibonacci-seq
-  ([] (fibonacci-seq 1 1))
+  ([] (fibonacci-seq 0 1))
   ([f1 f2] (cons f2 (lazy-seq (fibonacci-seq f2 (+ f1 f2))))))
 
 (defn project2 [n]
@@ -52,14 +59,15 @@
 (require '[clojure.string :as str])
 
 (defn palindromic? [n]
-  (let [a (seq (str n)) b (reverse a)]
+  (let [a (seq (str n))
+        b (reverse a)]
     (= a b)))
- 
-(defn has-3-digit-factors
+
+(defn has-3-digit-factors?
   [n]
   (let [sqrt-n (Math/floor (Math/sqrt n))]
-    (if
-      (> sqrt-n 999) false
+    (if (> sqrt-n 999)
+      false
       (loop [i sqrt-n]
         (cond
           (< i 100) false
@@ -69,7 +77,7 @@
 
 (defn project4 []
   (loop [n (* 999 999)]
-    (if (and (palindromic? n) (has-3-digit-factors n))
+    (if (and (palindromic? n) (has-3-digit-factors? n))
       n
       (recur (dec n)))))
 
@@ -281,7 +289,9 @@
   (loop [m 1 max-len 0 max-val 0]
     (if (>= m n) {max-val max-len}
       (let [new-len (count (collatz m))]
-        (if (> max-len new-len) (recur (inc m) max-len max-val) (recur (inc m) new-len m) )))))
+        (if (> max-len new-len)
+          (recur (inc m) max-len max-val)
+          (recur (inc m) new-len m) )))))
 
 (def project15 (memoize (fn [r c]
   (if (or (= r 0) (= c 0))
@@ -299,17 +309,17 @@
     [95 64]
     [17 47 82]
     [18 35 87 10]
-    [20 4 82 47 65]
-    [19 1 23 75 3 34]
-    [88 2 77 73 7 63 67]
-    [99 65 4 28 6 16 70 92]
+    [20  4 82 47 65]
+    [19  1 23 75  3 34]
+    [88  2 77 73  7 63 67]
+    [99 65  4 28  6 16 70 92]
     [41 41 26 56 83 40 80 70 33]
     [41 48 72 33 47 32 37 16 94 29]
     [53 71 44 65 25 43 91 52 97 51 14]
     [70 11 33 28 77 73 17 78 39 68 17 57]
     [91 71 52 38 17 14 91 43 58 50 27 29 48]
-    [63 66 4 68 89 53 67 30 73 16 69 87 40 31]
-    [4 62 98 27 23 9 70 98 73 93 38 53 60 4 23]])
+    [63 66  4 68 89 53 67 30 73 16 69 87 40 31]
+    [ 4 62 98 27 23  9 70 98 73 93 38 53 60  4 23]])
 
 (defn project18
   ([tri] (project18 tri (into [] (repeat (inc (count (first tri))) 0))))
@@ -350,9 +360,6 @@
       s
       (recur (quot v 10) (+ s (mod v 10))))))
 
-(defn project21
-  [n])
-
 (defn next-122 [known-values]
   {:pre [(sorted? known-values)]}
   (let [[n s] (first known-values)]
@@ -371,7 +378,7 @@
                             (= v-count current-count) (conj % v)
                             :else %))))
              known-values
-             (apply clojure.set/union
+             (apply set/union
                     (map (fn [v]
                            (let [maximum (last v)]
                              (into #{}
