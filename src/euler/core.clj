@@ -7,47 +7,6 @@
             [euler.run :as r])
   (:import java.lang.Math))
 
-(defn running-sum [n]
-  (/ (* n (+ n 1)) 2))
-
-(defn make-summer [n]
-  (fn [i]
-    (-> i
-        (/ n)
-        Math/floor
-        running-sum
-        (* n))
-    #_(* (running-sum (Math/floor (/ i n)))
-         n)))
-
-(defn int-pow [n x]
-  (reduce * (repeat x n)))
-
-(defn project6 [n]
-  (- (+ (* (running-sum n) (running-sum n))) (reduce + (map #(* % %) (range 1 (inc n)))))
-  )
-
-(defn project7 [n]
-  (last (take n primes)))
-
-(defn project8 [l n]
-  (let [digit-list (map #(- (int %) 48) (seq l))]
-    (loop [seqs '() m n]
-      (if (zero? m)
-        (apply max (apply map * seqs))
-        (recur (conj seqs (drop (- n m) digit-list)) (dec m))))))
-
-(defn project9 [n]
-  (reduce (fn [product a] (let [b (/ (- (/ (* n n) 2) (* n a)) (- n a))]
-                            (if (= b (int (Math/floor b)))
-                              (* a b (int (Math/sqrt (+ (* a a) (* b b)))))
-                              product)))
-          0 
-          (range 1 (/ n 3))))
-
-(defn project10 [n]
-  (reduce + (take-while #(< % n) primes)))
-
 (def project11-grid [[ 8  2 22 97 38 15  0 40  0 75  4  5  7 78 52 12 50 77 91  8]
                      [49 49 99 40 17 81 18 57 60 87 17 40 98 43 69 48  4 56 62  0]
                      [81 49 31 73 55 79 14 29 93 71 40 67 53 88 30  3 49 13 36 65]
@@ -69,29 +28,7 @@
                      [20 73 35 29 78 31 90  1 74 31 49 71 48 86 81 16 23 57  5 54]
                      [ 1 70 54 71 83 51 54 69 16 92 33 48 61 43 52  1 89 19 67 48]])
 
-(defn project11
-  [grid current-max]
-  (if (< (count grid) 4)
-    current-max
-    (let [r1 (first grid) r2 (second grid) r3 (first (rest (rest grid))) r4 (second (rest (rest grid)))]
-      (recur (rest grid) (reduce max current-max (concat
-                                                  (map * r1 (drop 1 r1) (drop 2 r1) (drop 3 r1))
-                                                  (map * r1 r2 r3 r4)
-                                                  (map * (drop 3 r1) (drop 2 r2) (drop 1 r3) r4)
-                                                  (map * r1 (drop 1 r2) (drop 2 r3) (drop 4 r4))))))))
-
-(defn lazy-triangle
-  ([] (lazy-triangle 0 1))
-  ([sum n] (cons (+ sum n) (lazy-seq (lazy-triangle (+ sum n) (inc n))))))
-
-(defn project12 [num-factors]
-  (loop [s (lazy-triangle)]
-    (let [n (first s)]
-      (if (< num-factors (apply * (map inc (map second (frequencies (factor/lazy-factor n))))))
-        n
-        (recur (rest s))))))
-
-(def p13-list [37107287533902102798797998220837590246510135740250
+(def project13-list [37107287533902102798797998220837590246510135740250
                46376937677490009712648124896970078050417018260538
                74324986199524741059474233309513058123726617309629
                91942213363574161572522430563301811072406154908250
@@ -192,36 +129,6 @@
                20849603980134001723930671666823555245252804609722
                53503534226472524250874054075591789781264330331690])
 
-(defn project13 []
-  (let [sum (apply + p13-list)
-        strsum (str sum)]
-    (subs strsum 0 10)))
-
-(def collatz (memoize (fn [n]
-                        (cond
-                          (= n 1) '(1)
-                          (even? n) (cons n (lazy-seq (collatz (/ n 2))))
-                          :else (cons n (lazy-seq (collatz (inc (* n 3)))))))))
-
-(defn project14 [n]
-  (loop [m 1 max-len 0 max-val 0]
-    (if (>= m n) {max-val max-len}
-        (let [new-len (count (collatz m))]
-          (if (> max-len new-len)
-            (recur (inc m) max-len max-val)
-            (recur (inc m) new-len m) )))))
-
-(def project15 (memoize (fn [r c]
-                          (if (or (= r 0) (= c 0))
-                            1
-                            (+ (project15 (dec r) c) (project15 r (dec c)))))))
-
-(defn project16
-  ([n] (project16 n 0))
-  ([n sum] (if (= n 0)
-             sum
-             (recur (bigint (/ n 10)) (+ sum (mod n 10))))))
-
 (def project-18-triangle [
                           [75]
                           [95 64]
@@ -238,17 +145,6 @@
                           [91 71 52 38 17 14 91 43 58 50 27 29 48]
                           [63 66  4 68 89 53 67 30 73 16 69 87 40 31]
                           [ 4 62 98 27 23  9 70 98 73 93 38 53 60  4 23]])
-
-(defn project18
-  ([tri] (project18 tri (into [] (repeat (inc (count (first tri))) 0))))
-  ([tri sums]
-   (letfn [(max-of-pairs
-             ([a] (max-of-pairs a []))
-             ([a sums] (if (< (count a) 2)
-                         sums
-                         (recur (rest a) (conj sums (max (first a) (second a)))))))]
-     (if (= 1 (count sums)) (first sums)
-         (recur (rest tri) (into [] (map + (first tri) (max-of-pairs sums))))))))
 
 (def months '(31 28 31 30 31 30 31 31 30 31 30 31
                  31 28 31 30 31 30 31 31 30 31 30 31
@@ -320,22 +216,22 @@
   (println "Project 122 - " (project122 200))
   (println "Project 20 - " (project20 200))
   (println "Project 19 - " (project19))
-  (println "Project 18 - " (project18 (reverse project-18-triangle)))
-  (println "Project 16 - " (project16 (apply * (repeat 1000 2N))))
-  (println "Project 15 - " (project15 20 20))
-  (println "Project 14 - " (project14 1000000))
-  (println "Project 13 - " (project13))
-  (println "Project 12 - " (project12 500))
-  (println "Project 11 - " (project11 project11-grid 0))
-  (println "Project 10 - " (project10 2000000))
-  (println "Project 9 - " (project9 1000))
-  (println "Project 8 - " (project8 "7316717653133062491922511967442657474235534919493496983520312774506326239578318016984801869478851843858615607891129494954595017379583319528532088055111254069874715852386305071569329096329522744304355766896648950445244523161731856403098711121722383113622298934233803081353362766142828064444866452387493035890729629049156044077239071381051585930796086670172427121883998797908792274921901699720888093776657273330010533678812202354218097512545405947522435258490771167055601360483958644670632441572215539753697817977846174064955149290862569321978468622482839722413756570560574902614079729686524145351004748216637048440319989000889524345065854122758866688116427171479924442928230863465674813919123162824586178664583591245665294765456828489128831426076900422421902267105562632111110937054421750694165896040807198403850962455444362981230987879927244284909188845801561660979191338754992005240636899125607176060588611646710940507754100225698315520005593572972571636269561882670428252483600823257530420752963450" 13))
-  (println "Project 7 - " (project7 10001))
-  (println "Project 6 - " (project6 100))
+  (println "Project 18 - " (r/run 18 project-18-triangle))
+  (println "Project 16 - " (r/run 16 (apply * (repeat 1000 2N))))
+  (println "Project 15 - " (r/run 15 20 20))
+  (println "Project 14 - " (r/run 14 1000000))
+  (println "Project 13 - " (r/run 13 project13-list))
+  (println "Project 12 - " (r/run 12 500))
+  (println "Project 11 - " (r/run 11 project11-grid))
+  (println "Project 10 - " (r/run 10 2000000))
+  (println "Project 9 - " (r/run 9 1000))
+  (println "Project 8 - " (r/run 8 "7316717653133062491922511967442657474235534919493496983520312774506326239578318016984801869478851843858615607891129494954595017379583319528532088055111254069874715852386305071569329096329522744304355766896648950445244523161731856403098711121722383113622298934233803081353362766142828064444866452387493035890729629049156044077239071381051585930796086670172427121883998797908792274921901699720888093776657273330010533678812202354218097512545405947522435258490771167055601360483958644670632441572215539753697817977846174064955149290862569321978468622482839722413756570560574902614079729686524145351004748216637048440319989000889524345065854122758866688116427171479924442928230863465674813919123162824586178664583591245665294765456828489128831426076900422421902267105562632111110937054421750694165896040807198403850962455444362981230987879927244284909188845801561660979191338754992005240636899125607176060588611646710940507754100225698315520005593572972571636269561882670428252483600823257530420752963450" 13))
+  (println "Project 7 - " (r/run 7 10001))
+  (println "Project 6 - " (r/run 6 100))
   (println "Project 5 - " (r/run 5 20))
   (println "Project 4 - " (r/run 4))
   (println "Project 3 - " (r/run 3 6857))
   (println "Project 2 - " (r/run 2 14000000))
   (println "Project 1 - " (r/run 1 1000))
   )
-  
+
