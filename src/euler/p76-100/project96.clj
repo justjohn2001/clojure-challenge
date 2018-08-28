@@ -11,9 +11,7 @@
 
 (defn read-boards
   [file-name]
-  (->> file-name
-       slurp
-       (string/split #"\n")
+  (->> (string/split (slurp file-name) #"\n")
        (partition-all 10)
        (map parse-board)))
 
@@ -21,27 +19,22 @@
   '([0 0] [0 1] [0 2] [1 0] [1 1] [1 2] [2 0] [2 1] [2 2]))
 
 (defn solve-board
-  ([board] (solve-board board 0 0))
+  ([board] (solve-board (first (rest board)) 0 0))
   ([board x y]
    (cond
      (> y 8) board
-     (zero? (get-in board [x y])) (do
-                                    (let [x' (- x (mod x 3))
-                                          y' (- y (mod y 3))]
-                                      (loop [test-value 0]
-                                        (when (< test-value 9)
-                                          (if (contains? (get board x) test-value)
-                                            (recur (inc test-value))
-                                            (if (contains? (mapv #(get-in board % y)) test-value)
-                                              (recur (inc test-value))
-                                              (if (contains? (mapv (fn [[dx dy]] (get-in board (+ x' dx) (+ y' dy)))
-                                                                   box-deltas)
-                                                             test-value)
-                                                (recur (inc test-value))
-                                                (or (solve-board (assoc-in board [x y] test-value)
-                                                                 (mod (inc x) 9)
-                                                                 (if (= 8 x) (inc y) y))
-                                                    (recur (inc test-value))))))))))
+     (zero? (get-in board [x y])) (let [x' (- x (mod x 3))
+                                        y' (- y (mod y 3))]
+                                    (loop [test-value 0]
+                                      (cond
+                                        (> test-value 9) nil
+                                        (some (partial = test-value) (get board x)) (recur (inc test-value))
+                                        (some (partial = test-value) (mapv #(get-in board [% y]) (range 9))) (recur (inc test-value))
+                                        (some (partial = test-value) (mapv (fn [[dx dy]] (get-in board [(+ x' dx) (+ y' dy)])) box-deltas)) (recur (inc test-value))
+                                        :else (or (solve-board (assoc-in board [x y] test-value)
+                                                               (mod (inc x) 9)
+                                                               (if (= x 8) (inc y) y))
+                                                  (recur (inc test-value))))))
      :else (solve-board board (mod (inc x) 9) (if (= 8 x) (inc y) y)))))
 
 (def test-board
@@ -57,6 +50,12 @@
    "004010003"] )
 
 (defmethod run 96
-  [file-name]
-  (let [boards (read-boards file-name)]))
+  [_ file-name]
+  (let [boards (read-boards file-name)]
+    (transduce (comp (map solve-board)
+                     (map first)
+                     (map #(+ (* 100 (first %)) (* 10 (second %)) (nth % 3))))
+               +
+               0
+               boards)))
 
