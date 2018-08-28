@@ -2,6 +2,7 @@
   (:gen-class)
   (:require [clojure.set :as set]
             [euler.p1-25]
+            [euler.p76-100]
             [euler.p101-125]
             [euler.run :as r])
   (:import java.lang.Math))
@@ -164,6 +165,7 @@
              18 [project18-triangle]
              19 []
              20 [100]
+             96 ["resources/p096_sudoku.txt"]
              122 [200]})
 
 (defn -main
