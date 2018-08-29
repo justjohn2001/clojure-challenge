@@ -15,12 +15,14 @@
        (partition-all 10)
        (map parse-board)))
 
-(def box-deltas 
-  '([0 0] [0 1] [0 2] [1 0] [1 1] [1 2] [2 0] [2 1] [2 2]))
+(def box-deltas
+  '([0 0] [0 1] [0 2]
+    [1 0] [1 1] [1 2]
+    [2 0] [2 1] [2 2]))
 
 (defn solve-board
-  ([board] (solve-board (first (rest board)) 0 0))
-  ([board x y]
+  ([[name board]] (solve-board board 0 0))
+  ([ board x y]
    (cond
      (> y 8) board
      (zero? (get-in board [x y])) (let [x' (- x (mod x 3))
@@ -37,24 +39,12 @@
                                                   (recur (inc test-value))))))
      :else (solve-board board (mod (inc x) 9) (if (= 8 x) (inc y) y)))))
 
-(def test-board
-  ["Grid 02"
-   "200080300"
-   "060070084"
-   "030500209"
-   "000105408"
-   "000000000"
-   "402706000"
-   "301007040"
-   "720040060"
-   "004010003"] )
-
 (defmethod run 96
   [_ file-name]
   (let [boards (read-boards file-name)]
     (transduce (comp (map solve-board)
                      (map first)
-                     (map #(+ (* 100 (first %)) (* 10 (second %)) (nth % 3))))
+                     (map #(+ (* 100 (first %)) (* 10 (second %)) (nth % 2))))
                +
                0
                boards)))
