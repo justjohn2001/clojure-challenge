@@ -22,22 +22,23 @@
 
 (defn solve-board
   ([[name board]] (solve-board board 0 0))
-  ([ board x y]
-   (cond
-     (> y 8) board
-     (zero? (get-in board [x y])) (let [x' (- x (mod x 3))
-                                        y' (- y (mod y 3))]
-                                    (loop [test-value 0]
-                                      (cond
-                                        (> test-value 9) nil
-                                        (some (partial = test-value) (get board x)) (recur (inc test-value))
-                                        (some (partial = test-value) (mapv #(get-in board [% y]) (range 9))) (recur (inc test-value))
-                                        (some (partial = test-value) (mapv (fn [[dx dy]] (get-in board [(+ x' dx) (+ y' dy)])) box-deltas)) (recur (inc test-value))
-                                        :else (or (solve-board (assoc-in board [x y] test-value)
-                                                               (mod (inc x) 9)
-                                                               (if (= x 8) (inc y) y))
-                                                  (recur (inc test-value))))))
-     :else (solve-board board (mod (inc x) 9) (if (= 8 x) (inc y) y)))))
+  ([board x y]
+   (if (> y 8)
+     board
+     (if (zero? (get-in board [x y]))
+       (let [x' (- x (mod x 3))
+             y' (- y (mod y 3))]
+         (loop [test-value 0]
+           (cond
+             (> test-value 9) nil
+             (some (partial = test-value) (get board x)) (recur (inc test-value))
+             (some (partial = test-value) (mapv #(get-in board [% y]) (range 9))) (recur (inc test-value))
+             (some (partial = test-value) (mapv (fn [[dx dy]] (get-in board [(+ x' dx) (+ y' dy)])) box-deltas)) (recur (inc test-value))
+             :else (or (solve-board (assoc-in board [x y] test-value)
+                                    (mod (inc x) 9)
+                                    (if (= x 8) (inc y) y))
+                       (recur (inc test-value))))))
+       (solve-board board (mod (inc x) 9) (if (= 8 x) (inc y) y))))))
 
 (defmethod run 96
   [_ file-name]
