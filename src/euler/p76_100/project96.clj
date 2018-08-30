@@ -1,5 +1,6 @@
 (ns euler.p76-100.project96
   (:require [euler.run :refer [run]]
+            [clojure.set :as set]
             [clojure.string :as string]))
 
 (defn parse-board
@@ -21,7 +22,7 @@
    [2 0] [2 1] [2 2]])
 
 (defn solve-board
-  ([[name board]] (do (print "Solving by 1")
+  ([[name board]] (do (println "Solving by 1 - " name)
                       (solve-board board 0 0)))
   ([board x y]
    (if (> y 8)
@@ -44,7 +45,7 @@
 (def all-values #{1 2 3 4 5 6 7 8 9 0})
 
 (defn solve-board-2
-  ([[name board]] (do (print "Solving by 2 -")
+  ([[name board]] (do (println "Solving by 2 - " name)
                       (solve-board-2 (into [] (flatten board)) 0)))
   ([board n]
    (cond
@@ -61,7 +62,7 @@
                                        (when-let [solved (solve-board-2 (assoc board n candidate) (inc n))]
                                          (reduced solved)))
                                      nil
-                                     (clojure.set/difference all-values used)))
+                                     (set/difference all-values used)))
      :else (recur board (inc n)))))
 
 (defn solve-board-3
@@ -86,7 +87,7 @@
                                        (when-let [solved (solve-board-2 (assoc board n candidate) (inc n))]
                                          (reduced solved)))
                                      nil
-                                     (clojure.set/difference all-values used)))
+                                     (set/difference all-values used)))
      :else (recur board (inc n)))))
 
 (defmethod run 96
