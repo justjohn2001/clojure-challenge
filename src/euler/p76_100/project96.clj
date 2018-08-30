@@ -40,9 +40,9 @@
                                     (mod (inc x) 9)
                                     (if (= x 8) (inc y) y))
                        (recur (inc test-value))))))
-       (solve-board board (mod (inc x) 9) (if (= 8 x) (inc y) y))))))
+       (recur board (mod (inc x) 9) (if (= 8 x) (inc y) y))))))
 
-(def all-values #{1 2 3 4 5 6 7 8 9 0})
+(def all-values #{1 2 3 4 5 6 7 8 9})
 
 (defn solve-board-2
   ([[name board]] (do (println "Solving by 2 - " name)
@@ -53,16 +53,17 @@
      (zero? (nth board n)) (let [x (mod n 9)
                                  y (quot n 9)
                                  box-n (- n (mod n 3) (* 9 (mod (quot n 9) 3)))
-                                 used (into #{}
-                                            (mapcat (juxt #(nth board (+ x (* % 9)))
-                                                          #(nth board (+ (* y 9) %))
-                                                          #(nth board (+ box-n (mod % 3) (* (quot % 3) 9))))
-                                                    (range 9)))]
-                             (reduce (fn [board' candidate]
+                                 unused (apply disj
+                                               all-values
+                                               (mapcat (juxt #(nth board (+ x (* % 9)))
+                                                             #(nth board (+ (* y 9) %))
+                                                             #(nth board (+ box-n (mod % 3) (* (quot % 3) 9))))
+                                                       (range 9)))]
+                            (reduce (fn [board' candidate]
                                        (when-let [solved (solve-board-2 (assoc board n candidate) (inc n))]
                                          (reduced solved)))
                                      nil
-                                     (set/difference all-values used)))
+                                     unused))
      :else (recur board (inc n)))))
 
 (defn solve-board-3
@@ -74,20 +75,21 @@
      (zero? (nth board n)) (let [x (mod n 9)
                                  y (quot n 9)
                                  box-n (- n (mod n 3) (* 9 (mod (quot n 9) 3)))
-                                 used (into #{}
-                                            (flatten
-                                             [(take 9 (drop (- n x) board))
-                                              (sequence (comp (drop x)
-                                                              (partition-all 9)
-                                                              (map first))
-                                                        board)
-                                              (map #(take 3 %)) (partition-all 9 (drop box-n board))])
-                                            )]
+                                 unused (apply disj
+                                               all-values
+                                               (concat
+                                                (take 9 (drop (- n x) board))
+                                                (sequence (comp (drop x)
+                                                                (partition-all 9)
+                                                                (map first))
+                                                          board)
+                                                (mapcat #(take 3 %)) (partition-all 9 (drop box-n board))))
+                                            ]
                              (reduce (fn [board' candidate]
                                        (when-let [solved (solve-board-2 (assoc board n candidate) (inc n))]
                                          (reduced solved)))
                                      nil
-                                     (set/difference all-values used)))
+                                     unused))
      :else (recur board (inc n)))))
 
 (defmethod run 96
