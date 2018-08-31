@@ -166,6 +166,7 @@
              19 []
              20 [100]
              96 ["resources/p096_sudoku.txt"]
+             102 ["resources/p102_triangles.txt"]
              122 [200]})
 
 (defn -main
