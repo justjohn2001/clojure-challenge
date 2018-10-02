@@ -13,3 +13,10 @@
   ([] (factor-seq 1))
   ([n] (cons (lazy-factor n) (lazy-seq (factor-seq (inc n))))))
 
+
+(defn divisors
+  [n]
+  (reduce (fn [known-divisors factor]
+            (apply conj known-divisors (map #(* % factor) known-divisors)))
+          #{1}
+          (lazy-factor n)))

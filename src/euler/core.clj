@@ -2,6 +2,7 @@
   (:gen-class)
   (:require [clojure.set :as set]
             [euler.p1-25]
+            [euler.p51-75]
             [euler.p76-100]
             [euler.p101-125]
             [euler.run :as r])
@@ -165,6 +166,7 @@
              18 [project18-triangle]
              19 []
              20 [100]
+             75 [1500000]
              96 ["resources/p096_sudoku.txt"]
              102 ["resources/p102_triangles.txt"]
              122 [200]})
